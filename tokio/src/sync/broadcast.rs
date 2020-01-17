@@ -591,6 +591,10 @@ impl<T> Sender<T> {
         // Release the mutex
         drop(tail);
 
+        if value.is_none() {
+            eprintln!("Writing None @ {} into slot {}", idx, pos);
+        }
+
         // Slot lock acquired
         slot.write.pos.with_mut(|ptr| unsafe { *ptr = pos });
         slot.write.val.with_mut(|ptr| unsafe { *ptr = value });
@@ -684,6 +688,8 @@ impl<T> Receiver<T> {
                 // capacity.
                 let next = tail.pos.wrapping_sub(self.shared.buffer.len() as u64);
                 let missed = next.wrapping_sub(self.next);
+
+                eprintln!("tail.pos: {} - buffer.len: {} = next: {}; next - self.next: {} = missed: {}", tail.pos, self.shared.buffer.len() as u64, next, self.next, missed);
 
                 self.next = next;
 
