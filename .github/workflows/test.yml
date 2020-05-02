@@ -20,7 +20,7 @@ jobs:
 
     steps:
     - name: "Install rust (*nix)"
-      if: ${{ matrix.os != "windows-latest" }}
+      if: ${{ matrix.os != 'windows-latest' }}
       run: |
         if [ "$RUSTUP_TOOLCHAIN" == "nightly" ]; then
           echo "++ getting latest miri version"
@@ -33,7 +33,7 @@ jobs:
         rustup toolchain install $RUSTUP_TOOLCHAIN
         rustup default $RUSTUP_TOOLCHAIN
     - name: "Install rust (windows)"
-      if: ${{ matrix.os == "windows-latest" }}
+      if: ${{ matrix.os == 'windows-latest' }}
       run: |
         curl -sSf -o rustup-init.exe https://win.rustup.rs
         rustup-init.exe -y --profile minimal --default-toolchain none
