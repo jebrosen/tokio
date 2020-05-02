@@ -5,6 +5,11 @@ env:
   LOOM_MAX_PREEMPTIONS: 2
   RUSTUP_TOOLCHAIN: stable
 
+defaults:
+  run:
+    # Always use bash (via git bash on Windows)
+    shell: bash
+
 jobs:
   install_rust:
     name: Install Rust
@@ -31,10 +36,10 @@ jobs:
       if: ${{ matrix.os == 'windows-latest' }}
       run: |
         curl -sSf -o rustup-init.exe https://win.rustup.rs
-        rustup-init.exe -y --profile minimal --default-toolchain none
-        set PATH=%PATH%;%USERPROFILE%\.cargo\bin
-        rustup toolchain install %RUSTUP_TOOLCHAIN%
-        rustup default %RUSTUP_TOOLCHAIN%
+        ./rustup-init.exe -y --profile minimal --default-toolchain none
+        export PATH=$PATH:$HOME/.cargo/bin
+        rustup toolchain install $RUSTUP_TOOLCHAIN
+        rustup default $RUSTUP_TOOLCHAIN
     - name: Query rust and cargo versions
       run: |
         rustup toolchain list
