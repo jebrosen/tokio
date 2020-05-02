@@ -1,0 +1,47 @@
+on: [push, pull_request]
+
+env:
+  RUSTFLAGS: "-Dwarnings"
+  LOOM_MAX_PREEMPTIONS: 2
+  RUST_TOOLCHAIN: stable
+
+defaults:
+  run:
+    # Always use bash (via git bash on Windows)
+    shell: bash
+
+jobs:
+  install_rust:
+    name: Install Rust
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    steps:
+    - name: "Install rust (*nix)"
+      if: ${{ matrix.os != "windows-latest" }}
+      run: |
+        if [ "$RUSTUP_TOOLCHAIN" == "nightly" ]; then
+          echo "++ getting latest miri version"
+          export RUSTUP_TOOLCHAIN="nightly-$(curl -s https://rust-lang.github.io/rustup-components-history/x86_64-unknown-linux-gnu/miri)"
+          echo "$RUSTUP_TOOLCHAIN"
+        fi
+
+        curl https://sh.rustup.rs -sSf | sh -s -- -y --profile minimal --default-toolchain none
+        export PATH=$PATH:$HOME/.cargo/bin
+        rustup toolchain install $RUSTUP_TOOLCHAIN
+        rustup default $RUSTUP_TOOLCHAIN
+    - name: "Install rust (windows)"
+      if: ${{ matrix.os == "windows-latest" }}
+      run: |
+        curl -sSf -o rustup-init.exe https://win.rustup.rs
+        rustup-init.exe -y --profile minimal --default-toolchain none
+        set PATH=%PATH%;%USERPROFILE%\.cargo\bin
+        rustup toolchain install %RUSTUP_TOOLCHAIN%
+        rustup default %RUSTUP_TOOLCHAIN%
+    - name: Query rust and cargo versions
+      run: |
+        rustup toolchain list
+        rustc -Vv
+        cargo -V
