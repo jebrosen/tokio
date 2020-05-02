@@ -3,12 +3,7 @@ on: [push, pull_request]
 env:
   RUSTFLAGS: "-Dwarnings"
   LOOM_MAX_PREEMPTIONS: 2
-  RUST_TOOLCHAIN: stable
-
-defaults:
-  run:
-    # Always use bash (via git bash on Windows)
-    shell: bash
+  RUSTUP_TOOLCHAIN: stable
 
 jobs:
   install_rust:
